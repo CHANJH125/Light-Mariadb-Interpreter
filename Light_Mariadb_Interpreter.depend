@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1737831011 source:c:\users\user\projects\light_mariadb_interpreter\main.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<unordered_set>
+	<unordered_map>
+	<vector>
+	<algorithm>
+	<sstream>
+
