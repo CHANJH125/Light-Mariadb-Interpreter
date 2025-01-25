@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1737833879 source:c:\users\user\projects\light_mariadb_interpreter\main.cpp
+1737838602 source:c:\users\user\projects\light_mariadb_interpreter\main.cpp
 	<iostream>
 	<fstream>
 	<string>
