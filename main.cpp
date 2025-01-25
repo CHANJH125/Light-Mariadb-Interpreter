@@ -11,6 +11,7 @@ using namespace std;
 // Store created tables and their data
 unordered_set<string> createdTables;
 unordered_map<string, vector<string>> tableData;
+ofstream outputFile;  // Output file stream
 
 // Function prototypes
 void createFile(const string& filename);
@@ -19,13 +20,21 @@ void insertIntoTable(const string& line);
 void displayTables();
 void processLine(const string& line, const string& filename);
 void displayDatabasePath(const string& filename);
+void writeToOutputFile(const string& message);
+
+void writeToOutputFile(const string& message) {
+    cout << message << endl;        // Display on screen
+    if (outputFile.is_open()) {
+        outputFile << message << endl;  // Write to file
+    }
+}
 
 void createFile(const string& filename) {
-    ofstream outfile(filename);
-    if (outfile) {
-        cout << "File created: " << filename << endl;
+    outputFile.open(filename);
+    if (outputFile) {
+        writeToOutputFile("File created: " + filename);
     } else {
-        cout << "Error creating file: " << filename << endl;
+        writeToOutputFile("Error creating file: " + filename);
     }
 }
 
@@ -37,9 +46,9 @@ void createTable(const string& line) {
 
     if (createdTables.find(tableName) == createdTables.end()) {
         createdTables.insert(tableName);
-        cout << "Table created: " << tableName << endl;
+        writeToOutputFile("Table created: " + tableName);
     } else {
-        cout << "Table already exists: " << tableName << endl;
+        writeToOutputFile("Table already exists: " + tableName);
     }
 }
 
@@ -50,7 +59,7 @@ void insertIntoTable(const string& line) {
     tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end());
 
     if (createdTables.find(tableName) == createdTables.end()) {
-        cout << "Table does not exist: " << tableName << endl;
+        writeToOutputFile("Table does not exist: " + tableName);
         return;
     }
 
@@ -59,32 +68,41 @@ void insertIntoTable(const string& line) {
     values.erase(remove_if(values.begin(), values.end(), ::isspace), values.end());
 
     tableData[tableName].push_back(values);
-    cout << "Inserted into table " << tableName << ": " << values << endl;
+    writeToOutputFile("Inserted into table " + tableName + ": " + values);
 }
 
 void displayTables() {
     if (createdTables.empty()) {
-        cout << "No tables have been created." << endl;
+        writeToOutputFile("No tables have been created.");
     } else {
-        cout << "Tables:" << endl;
+        writeToOutputFile("Tables:");
         for (const string& tableName : createdTables) {
-            cout << "- " << tableName << endl;
+            writeToOutputFile("- " + tableName);
         }
     }
 }
 
 void displayDatabasePath(const string& filename) {
-    cout << "Path of the .mdb file: " << filename << endl;
+    writeToOutputFile("Path of the .mdb file: " + filename);
 }
 
 void processLine(const string& line, const string& filename) {
     // Print each line
-    cout << line << endl;
+    writeToOutputFile(line);
 
     if (line.find("CREATE") != string::npos) {
-        if (line.find("CREATE fileOutput1.txt") != string::npos) {
-            createFile("fileOutput1.txt");
-        } else if (line.find("CREATE TABLE") != string::npos) {
+        // Check if it's CREATE FILE or CREATE TABLE
+        size_t pos = line.find("CREATE") + 6;
+        size_t spacePos = line.find(' ', pos);
+        string fileName = line.substr(spacePos + 1);
+        fileName.erase(remove_if(fileName.begin(), fileName.end(), ::isspace), fileName.end());
+
+        // If it's creating a file (not a table), just create the file
+        if (line.find("TABLE") == string::npos) {
+            createFile(fileName);
+        }
+        // Otherwise, create the table
+        else {
             createTable(line);
         }
     } else if (line.find("DATABASES") != string::npos) {
@@ -93,6 +111,29 @@ void processLine(const string& line, const string& filename) {
         displayTables();
     } else if (line.find("INSERT INTO") != string::npos) {
         insertIntoTable(line);
+    } else if (line.find("SELECT * FROM") != string::npos) {
+        string tableName = line.substr(14, line.find(';') - 14);
+        tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end());
+
+        if (createdTables.find(tableName) == createdTables.end()) {
+            writeToOutputFile("Table does not exist: " + tableName);
+        } else {
+            writeToOutputFile("Table: " + tableName);
+            writeToOutputFile("Data (CSV format):");
+            for (const string& row : tableData[tableName]) {
+                writeToOutputFile(row);
+            }
+        }
+    } else if (line.find("SELECT COUNT(*) FROM") != string::npos) {
+        string tableName = line.substr(20, line.find(';') - 20);
+        tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end());
+
+        if (createdTables.find(tableName) == createdTables.end()) {
+            writeToOutputFile("Table does not exist: " + tableName);
+        } else {
+            size_t rowCount = tableData[tableName].size();
+            writeToOutputFile("Row count for table " + tableName + ": " + to_string(rowCount));
+        }
     }
 }
 
@@ -107,13 +148,17 @@ int main() {
     ifstream infile(filename);
 
     if (infile.fail()) {
-        cout << "Error opening file: " << filename << endl;
+        writeToOutputFile("Error opening file: " + filename);
     } else {
         string line;
         while (getline(infile, line)) {
             processLine(line, filename);
         }
         infile.close();
+    }
+
+    if (outputFile.is_open()) {
+        outputFile.close();  // Close the output file after processing
     }
 
     return 0;
