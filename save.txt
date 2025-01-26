@@ -109,6 +109,7 @@ void insertIntoTable(const string& line) {
     }
 
     tableData[tableName].push_back(values);  // Store the row without parentheses and quotes
+    writeToOutputFile("Inserted into table " + tableName + ": " + values);
 }
 
 void displayTables() {
@@ -126,39 +127,70 @@ void displayDatabasePath(const string& filename) {
 }
 
 void processDeleteData(const string& deleteCommand) {
-    // Extract the value after WHERE (in your case, customer_id=4)
-    size_t pos = deleteCommand.find("WHERE customer_id=");
-    if (pos != string::npos) {
-        // Extract the number after "WHERE customer_id="
-        string valueToDelete = deleteCommand.substr(pos + 18);  // Skip past "WHERE customer_id="
-        valueToDelete = valueToDelete.substr(0, valueToDelete.find(';'));  // Get the value before ';'
+    size_t fromPos = deleteCommand.find("DELETE FROM");
+    size_t wherePos = deleteCommand.find("WHERE");
 
-        // Clean the value to remove any unwanted characters (like spaces)
-        valueToDelete.erase(remove_if(valueToDelete.begin(), valueToDelete.end(), ::isspace), valueToDelete.end());
+    if (fromPos == string::npos || wherePos == string::npos) {
+        cout << "Invalid DELETE statement." << endl;
+        return;
+    }
 
-        // Now, check each row in the customer table
-        bool found = false;
-        for (auto it = tableData["customer"].begin(); it != tableData["customer"].end(); ++it) {
-            string row = *it;
-            // Clean the row to get the value before the first comma
-            size_t posComma = row.find(',');
-            string valueBeforeComma = row.substr(1, posComma - 1);  // Extract the number inside parentheses (before the comma)
+    // Extract table name (between "DELETE FROM" and "WHERE")
+    string tableName = deleteCommand.substr(fromPos + 11, wherePos - (fromPos + 11));
+    tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end());  // Trim spaces
 
-            // Compare the value before comma with the valueToDelete
-            if (valueBeforeComma == valueToDelete) {
-                tableData["customer"].erase(it);  // Remove the row if it matches
-                found = true;
-                break;  // Exit loop after deleting the row
+    // Print out the table name for confirmation
+    cout << "Table: " << tableName << endl;
+
+    // Extract condition value (after "=")
+    size_t equalPos = deleteCommand.find("=", wherePos);
+    if (equalPos == string::npos) {
+        cout << "Invalid DELETE statement." << endl;
+        return;
+    }
+
+    string value = deleteCommand.substr(equalPos + 1);
+    value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());  // Trim spaces
+    if (value.front() == '\'' || value.front() == '\"') {
+        value = value.substr(1, value.length() - 2);  // Remove surrounding quotes
+    }
+
+    // Print out the value for confirmation
+    cout << "Value: " << value << endl;
+
+    // Check if table exists in tableData
+    if (tableData.find(tableName) == tableData.end()) {
+        cout << "Table not found: " << tableName << endl;
+        return;
+    }
+
+    // Get the rows of the specified table
+    vector<string> rows = tableData[tableName];
+
+    // Iterate through the rows (skip header)
+    for (size_t i = 1; i < rows.size(); ++i) {
+        string row = rows[i];
+
+        // Find the first comma in the row
+        size_t pos = row.find(',');
+
+        // Extract the value before the comma (assuming it's the ID value)
+        if (pos != string::npos) {
+            string valueBeforeComma = row.substr(0, pos);
+
+            // Debug: Print the value before the comma to see what's inside
+            cout << "Row: " << row << endl;
+            cout << "Value before comma: '" << valueBeforeComma << "'" << endl;
+            cout << "Comparing with: '" << value << "'" << endl;
+
+            // If the value before the comma matches the DELETE value, print the row
+            if (valueBeforeComma == value) {
+                cout << "Matching row: " << row << endl;
             }
         }
-
-        if (!found) {
-            writeToOutputFile("No matching row found for customer_id=" + valueToDelete);
-        }
-    } else {
-        writeToOutputFile("Invalid DELETE command.");
     }
 }
+
 
 
 void processLine(const string& line, const string& filename) {
@@ -253,3 +285,5 @@ int main() {
 
     return 0;
 }
+
+********* compare already
