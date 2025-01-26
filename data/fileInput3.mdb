@@ -1,15 +1,37 @@
-CREATE fileOutput1.txt;
+CREATE fileOutput3.txt;
 DATABASES;
-CREATE TABLE orders(
-id INT,
-date DATE,
-time TIME,
-amount DECIMAL(10, 2),
-customerphone TEXT
+
+CREATE TABLE friends (
+friend_id INT,
+first_name TEXT,
+last_name TEXT,
+email TEXT,
+phone_number TEXT,
+birthday TEXT,
+star_sign TEXT,
+address TEXT,
+next_met TEXT,
+mutual_friends INT
 );
 TABLES;
-INSERT INTO orders(id, date, time, amount, customerphone) VALUES (1, '2025-01-26', '14:30:00', 150.75, '123-456-7890');
-INSERT INTO orders(id, date, time, amount, customerphone) VALUES (2, '2025-01-26', '15:00:00', 200.50, '987-654-3210');
-INSERT INTO orders(id, date, time, amount, customerphone) VALUES (3, '2025-01-26', '16:45:00', 120.00, '555-123-4567');
-INSERT INTO orders(id, date, time, amount, customerphone) VALUES (4, '2025-01-26', '18:30:00', 99.99, '444-222-1111');
-SELECT * FROM orders;
+
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (1, 'John', 'Doe', 'johndoe@example.com', '123-456-7890', '1990-05-15', 'Taurus', '123 Main St, Springfield, IL', '2025-06-10', 5);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (2, 'Jane', 'Smith', 'janesmith@example.com', '987-654-3210', '1988-08-22', 'Virgo', '456 Elm St, Springfield, IL', '2025-06-12', 3);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (3, 'Alice', 'Johnson', 'alicej@example.com', '555-555-5555', '1992-02-19', 'Pisces', '789 Oak St, Springfield, IL', '2025-06-14', 7);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (4, 'Bob', 'Williams', 'bobw@example.com', '444-444-4444', '1991-11-10', 'Scorpio', '101 Pine St, Springfield, IL', '2025-06-15', 6);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (5, 'Charlie', 'Brown', 'charlieb@example.com', '333-333-3333', '1993-07-30', 'Leo', '202 Birch St, Springfield, IL', '2025-06-16', 4);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (6, 'David', 'Miller', 'davidm@example.com', '666-666-6666', '1990-12-05', 'Sagittarius', '303 Cedar St, Springfield, IL', '2025-06-17', 8);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (7, 'Eve', 'Davis', 'eved@example.com', '777-777-7777', '1994-01-20', 'Capricorn', '404 Maple St, Springfield, IL', '2025-06-18', 2);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (8, 'Frank', 'Morris', 'frankm@example.com', '888-888-8888', '1991-04-12', 'Aries', '505 Oakwood St, Springfield, IL', '2025-06-19', 9);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (9, 'Grace', 'Taylor', 'gracet@example.com', '999-999-9999', '1992-10-05', 'Libra', '606 Birchwood St, Springfield, IL', '2025-06-20', 3);
+INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (10, 'Hannah', 'Jackson', 'hannahj@example.com', '111-111-1111', '1995-09-25', 'Virgo', '707 Pinewood St, Springfield, IL', '2025-06-21', 4);
+
+SELECT * FROM friends;
+
+UPDATE friends SET last_name = 'Smoth' WHERE friend_id = 2;
+SELECT * FROM friends;
+
+DELETE FROM friends WHERE friend_id = 8;
+SELECT * FROM friends;
+
+SELECT COUNT(*) FROM friends;
