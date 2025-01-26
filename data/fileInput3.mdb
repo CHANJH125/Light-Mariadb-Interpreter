@@ -1,0 +1,15 @@
+CREATE fileOutput1.txt;
+DATABASES;
+CREATE TABLE orders(
+id INT,
+date DATE,
+time TIME,
+amount DECIMAL(10, 2),
+customerphone TEXT
+);
+TABLES;
+INSERT INTO orders(id, date, time, amount, customerphone) VALUES (1, '2025-01-26', '14:30:00', 150.75, '123-456-7890');
+INSERT INTO orders(id, date, time, amount, customerphone) VALUES (2, '2025-01-26', '15:00:00', 200.50, '987-654-3210');
+INSERT INTO orders(id, date, time, amount, customerphone) VALUES (3, '2025-01-26', '16:45:00', 120.00, '555-123-4567');
+INSERT INTO orders(id, date, time, amount, customerphone) VALUES (4, '2025-01-26', '18:30:00', 99.99, '444-222-1111');
+SELECT * FROM orders;

@@ -67,7 +67,7 @@ void writeToOutputFile(const string& message) {
 void createFile(const string& filename) {
     outputFile.open(filename);
     if (outputFile) {
-        writeToOutputFile(">CREATE " + filename + ";");
+        writeToOutputFile(">CREATE " + filename);
     } else {
         writeToOutputFile("Error creating file: " + filename);
     }
@@ -112,12 +112,7 @@ void insertIntoTable(const string& line) {
         values.erase(posStart, 1);  // Remove single quotes
     }
 
-    // Remove semicolon at the end if it exists
-    if (!values.empty() && values.back() == ';') {
-        values.pop_back();  // Remove the semicolon
-    }
-
-    tableData[tableName].push_back(values);  // Store the row without parentheses, quotes, or semicolon
+    tableData[tableName].push_back(values);  // Store the row without parentheses and quotes
 }
 
 void displayTables() {
@@ -318,15 +313,11 @@ void processLine(const string& line, const string& filename) {
         string fileName = line.substr(spacePos + 1);
         fileName.erase(remove_if(fileName.begin(), fileName.end(), ::isspace), fileName.end());
 
-        // Remove semicolon if it exists at the end of the fileName
-        if (!fileName.empty() && fileName.back() == ';') {
-            fileName.pop_back();  // Removes the semicolon
-        }
-
         // If it's creating a file (not a table), just create the file
         if (line.find("TABLE") == string::npos) {
-            createFile(fileName);  // Now it passes without the semicolon
+            createFile(fileName);
         }
+        // Otherwise, create the table
         else {
             createTable(line);
         }
@@ -384,6 +375,7 @@ int main() {
     string basePath = "C:\\Users\\User\\Projects\\Light_Mariadb_Interpreter\\data\\";  // Base directory
     string fileInput;
 
+    cout << "Enter the .mdb file name: ";
     getline(cin, fileInput);
     string filename = basePath + fileInput;
 
