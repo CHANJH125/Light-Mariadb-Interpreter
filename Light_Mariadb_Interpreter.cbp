@@ -34,6 +34,7 @@
 		</Compiler>
 		<Unit filename="data/fileInput1.mdb" />
 		<Unit filename="data/fileInput2.mdb" />
+		<Unit filename="data/fileInput3.mdb" />
 		<Unit filename="main.cpp" />
 		<Unit filename="save.txt" />
 		<Extensions>

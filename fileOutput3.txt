@@ -1,0 +1,66 @@
+>CREATE fileOutput3.txt;
+>DATABASES;
+C:\Users\User\Projects\Light_Mariadb_Interpreter\data\fileInput3.mdb
+>CREATE TABLE friends (
+friend_id INT,
+first_name TEXT,
+last_name TEXT,
+email TEXT,
+phone_number TEXT,
+birthday TEXT,
+star_sign TEXT,
+address TEXT,
+next_met TEXT,
+mutual_friends INT
+);
+>TABLES;
+friends
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (1, 'John', 'Doe', 'johndoe@example.com', '123-456-7890', '1990-05-15', 'Taurus', '123 Main St, Springfield, IL', '2025-06-10', 5);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (2, 'Jane', 'Smith', 'janesmith@example.com', '987-654-3210', '1988-08-22', 'Virgo', '456 Elm St, Springfield, IL', '2025-06-12', 3);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (3, 'Alice', 'Johnson', 'alicej@example.com', '555-555-5555', '1992-02-19', 'Pisces', '789 Oak St, Springfield, IL', '2025-06-14', 7);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (4, 'Bob', 'Williams', 'bobw@example.com', '444-444-4444', '1991-11-10', 'Scorpio', '101 Pine St, Springfield, IL', '2025-06-15', 6);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (5, 'Charlie', 'Brown', 'charlieb@example.com', '333-333-3333', '1993-07-30', 'Leo', '202 Birch St, Springfield, IL', '2025-06-16', 4);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (6, 'David', 'Miller', 'davidm@example.com', '666-666-6666', '1990-12-05', 'Sagittarius', '303 Cedar St, Springfield, IL', '2025-06-17', 8);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (7, 'Eve', 'Davis', 'eved@example.com', '777-777-7777', '1994-01-20', 'Capricorn', '404 Maple St, Springfield, IL', '2025-06-18', 2);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (8, 'Frank', 'Morris', 'frankm@example.com', '888-888-8888', '1991-04-12', 'Aries', '505 Oakwood St, Springfield, IL', '2025-06-19', 9);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (9, 'Grace', 'Taylor', 'gracet@example.com', '999-999-9999', '1992-10-05', 'Libra', '606 Birchwood St, Springfield, IL', '2025-06-20', 3);
+>INSERT INTO friends (friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends) VALUES (10, 'Hannah', 'Jackson', 'hannahj@example.com', '111-111-1111', '1995-09-25', 'Virgo', '707 Pinewood St, Springfield, IL', '2025-06-21', 4);
+>SELECT * FROM friends;
+friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends
+1,John,Doe,johndoe@example.com,123-456-7890,1990-05-15,Taurus,123MainSt,Springfield,IL,2025-06-10,5
+2,Jane,Smith,janesmith@example.com,987-654-3210,1988-08-22,Virgo,456ElmSt,Springfield,IL,2025-06-12,3
+3,Alice,Johnson,alicej@example.com,555-555-5555,1992-02-19,Pisces,789OakSt,Springfield,IL,2025-06-14,7
+4,Bob,Williams,bobw@example.com,444-444-4444,1991-11-10,Scorpio,101PineSt,Springfield,IL,2025-06-15,6
+5,Charlie,Brown,charlieb@example.com,333-333-3333,1993-07-30,Leo,202BirchSt,Springfield,IL,2025-06-16,4
+6,David,Miller,davidm@example.com,666-666-6666,1990-12-05,Sagittarius,303CedarSt,Springfield,IL,2025-06-17,8
+7,Eve,Davis,eved@example.com,777-777-7777,1994-01-20,Capricorn,404MapleSt,Springfield,IL,2025-06-18,2
+8,Frank,Morris,frankm@example.com,888-888-8888,1991-04-12,Aries,505OakwoodSt,Springfield,IL,2025-06-19,9
+9,Grace,Taylor,gracet@example.com,999-999-9999,1992-10-05,Libra,606BirchwoodSt,Springfield,IL,2025-06-20,3
+10,Hannah,Jackson,hannahj@example.com,111-111-1111,1995-09-25,Virgo,707PinewoodSt,Springfield,IL,2025-06-21,4
+>UPDATE friends SET last_name = 'Smoth' WHERE friend_id = 2;
+>SELECT * FROM friends;
+friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends
+1,John,Doe,johndoe@example.com,123-456-7890,1990-05-15,Taurus,123MainSt,Springfield,IL,2025-06-10,5
+2,Jane,Smoth,janesmith@example.com,987-654-3210,1988-08-22,Virgo,456ElmSt,Springfield,IL,2025-06-12,3
+3,Alice,Johnson,alicej@example.com,555-555-5555,1992-02-19,Pisces,789OakSt,Springfield,IL,2025-06-14,7
+4,Bob,Williams,bobw@example.com,444-444-4444,1991-11-10,Scorpio,101PineSt,Springfield,IL,2025-06-15,6
+5,Charlie,Brown,charlieb@example.com,333-333-3333,1993-07-30,Leo,202BirchSt,Springfield,IL,2025-06-16,4
+6,David,Miller,davidm@example.com,666-666-6666,1990-12-05,Sagittarius,303CedarSt,Springfield,IL,2025-06-17,8
+7,Eve,Davis,eved@example.com,777-777-7777,1994-01-20,Capricorn,404MapleSt,Springfield,IL,2025-06-18,2
+8,Frank,Morris,frankm@example.com,888-888-8888,1991-04-12,Aries,505OakwoodSt,Springfield,IL,2025-06-19,9
+9,Grace,Taylor,gracet@example.com,999-999-9999,1992-10-05,Libra,606BirchwoodSt,Springfield,IL,2025-06-20,3
+10,Hannah,Jackson,hannahj@example.com,111-111-1111,1995-09-25,Virgo,707PinewoodSt,Springfield,IL,2025-06-21,4
+>DELETE FROM friends WHERE friend_id = 8;
+>SELECT * FROM friends;
+friend_id, first_name, last_name, email, phone_number, birthday, star_sign, address, next_met, mutual_friends
+1,John,Doe,johndoe@example.com,123-456-7890,1990-05-15,Taurus,123MainSt,Springfield,IL,2025-06-10,5
+2,Jane,Smoth,janesmith@example.com,987-654-3210,1988-08-22,Virgo,456ElmSt,Springfield,IL,2025-06-12,3
+3,Alice,Johnson,alicej@example.com,555-555-5555,1992-02-19,Pisces,789OakSt,Springfield,IL,2025-06-14,7
+4,Bob,Williams,bobw@example.com,444-444-4444,1991-11-10,Scorpio,101PineSt,Springfield,IL,2025-06-15,6
+5,Charlie,Brown,charlieb@example.com,333-333-3333,1993-07-30,Leo,202BirchSt,Springfield,IL,2025-06-16,4
+6,David,Miller,davidm@example.com,666-666-6666,1990-12-05,Sagittarius,303CedarSt,Springfield,IL,2025-06-17,8
+7,Eve,Davis,eved@example.com,777-777-7777,1994-01-20,Capricorn,404MapleSt,Springfield,IL,2025-06-18,2
+9,Grace,Taylor,gracet@example.com,999-999-9999,1992-10-05,Libra,606BirchwoodSt,Springfield,IL,2025-06-20,3
+10,Hannah,Jackson,hannahj@example.com,111-111-1111,1995-09-25,Virgo,707PinewoodSt,Springfield,IL,2025-06-21,4
+>SELECT COUNT(*) FROM friends;
+9
