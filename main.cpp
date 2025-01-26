@@ -19,6 +19,7 @@ void processLine(const string& line, const string& filename);
 void displayDatabasePath(const string& filename);
 void writeToOutputFile(const string& message);
 void processDeleteData(const string& deleteCommand);
+void processUpdateData(const string& updateCommand);
 
 // Function to parse CSV (removes parentheses and single quotes)
 // Debugging to check parsed CSV
@@ -54,16 +55,19 @@ unordered_map<string, vector<string>> tableData;
 ofstream outputFile;  // Output file stream
 
 void writeToOutputFile(const string& message) {
-    cout << message << endl;        // Display on screen
-    if (outputFile.is_open()) {
-        outputFile << message << endl;  // Write to file
+    if (!message.empty()) {  // Only write if the message is not empty
+        cout << message << endl;  // Display on screen
+        if (outputFile.is_open()) {
+            outputFile << message << endl;  // Write to file
+        }
     }
 }
+
 
 void createFile(const string& filename) {
     outputFile.open(filename);
     if (outputFile) {
-        writeToOutputFile("CREATE " + filename);
+        writeToOutputFile(">CREATE " + filename + ";");
     } else {
         writeToOutputFile("Error creating file: " + filename);
     }
@@ -108,7 +112,12 @@ void insertIntoTable(const string& line) {
         values.erase(posStart, 1);  // Remove single quotes
     }
 
-    tableData[tableName].push_back(values);  // Store the row without parentheses and quotes
+    // Remove semicolon at the end if it exists
+    if (!values.empty() && values.back() == ';') {
+        values.pop_back();  // Remove the semicolon
+    }
+
+    tableData[tableName].push_back(values);  // Store the row without parentheses, quotes, or semicolon
 }
 
 void displayTables() {
@@ -160,11 +169,148 @@ void processDeleteData(const string& deleteCommand) {
     }
 }
 
+void processUpdateData(const string& updateCommand) {
+    // Find the position of SET and WHERE in the updateCommand
+    size_t setPos = updateCommand.find("SET ");
+    size_t wherePos = updateCommand.find("WHERE");
+
+    if (setPos == string::npos || wherePos == string::npos) {
+        writeToOutputFile("Invalid UPDATE command.");
+        return;
+    }
+
+    // Extract the table name (assumed to be after "UPDATE ")
+    string tableName = updateCommand.substr(6, setPos - 6);
+    tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end()); // Remove spaces
+
+    if (tableName != "customer") {
+        writeToOutputFile("Invalid table name: " + tableName);
+        return;
+    }
+
+    // Extract the SET clause (e.g., customer_email='email333')
+    string setClause = updateCommand.substr(setPos + 4, wherePos - setPos - 4);
+
+    // Parse the SET clause to extract the column and the new value
+    size_t equalPos = setClause.find('=');
+    if (equalPos == string::npos) {
+        writeToOutputFile("Invalid SET clause in UPDATE command.");
+        return;
+    }
+
+    string columnToUpdate = setClause.substr(0, equalPos);
+    string newValue = setClause.substr(equalPos + 1);
+
+    columnToUpdate.erase(remove_if(columnToUpdate.begin(), columnToUpdate.end(), ::isspace), columnToUpdate.end());
+    newValue.erase(remove_if(newValue.begin(), newValue.end(), ::isspace), newValue.end());
+
+    // Extract the WHERE condition (e.g., customer_id=3)
+    string wherePart = updateCommand.substr(wherePos + 6);  // After "WHERE "
+    wherePart.erase(remove_if(wherePart.begin(), wherePart.end(), ::isspace), wherePart.end());
+
+    size_t whereEqualPos = wherePart.find('=');
+    if (whereEqualPos == string::npos) {
+        writeToOutputFile("Invalid WHERE condition in UPDATE command.");
+        return;
+    }
+
+    string whereColumn = wherePart.substr(0, whereEqualPos);
+    string whereValue = wherePart.substr(whereEqualPos + 1);
+    whereColumn.erase(remove_if(whereColumn.begin(), whereColumn.end(), ::isspace), whereColumn.end());
+
+    // Remove any trailing semicolon and trim spaces from whereValue
+    whereValue.erase(remove(whereValue.begin(), whereValue.end(), ';'), whereValue.end());
+    whereValue.erase(remove_if(whereValue.begin(), whereValue.end(), ::isspace), whereValue.end());
+
+    // Print the value to match for the WHERE condition
+//    writeToOutputFile("Value to match: '" + whereValue + "'");
+
+    // Now check each row and replace the value based on the first number before the first comma
+    bool found = false;
+    for (auto it = tableData["customer"].begin(); it != tableData["customer"].end(); ++it) {
+        string row = *it;
+
+        // Extract the customer_id (first column value) by getting the substring before the first comma
+        size_t posComma = row.find(',');
+        string valueBeforeComma = row.substr(0, posComma);  // Extract the customer_id
+
+        // Remove parentheses from customer_id if present
+        if (!valueBeforeComma.empty() && valueBeforeComma[0] == '(') {
+            valueBeforeComma = valueBeforeComma.substr(1);  // Remove the '('
+        }
+        if (!valueBeforeComma.empty() && valueBeforeComma.back() == ')') {
+            valueBeforeComma = valueBeforeComma.substr(0, valueBeforeComma.size() - 1);  // Remove the ')'
+        }
+
+        // Trim spaces if any
+        valueBeforeComma.erase(remove_if(valueBeforeComma.begin(), valueBeforeComma.end(), ::isspace), valueBeforeComma.end());
+        whereValue.erase(remove_if(whereValue.begin(), whereValue.end(), ::isspace), whereValue.end());
+
+
+        // Check and print their comparison
+        if (valueBeforeComma == whereValue) {
+            // Split the row by commas into substrings
+            vector<string> columns;
+            size_t startPos = 0;
+            size_t commaPos = 0;
+            while ((commaPos = row.find(',', startPos)) != string::npos) {
+                columns.push_back(row.substr(startPos, commaPos - startPos));
+                startPos = commaPos + 1;
+            }
+            // Don't forget the last column (after the last comma)
+            columns.push_back(row.substr(startPos));
+
+            // Update the column value after the 6th comma (7th column)
+            columns[6] = newValue;  // Assuming 'customer_email' is the 7th column
+
+            // Rebuild the row with updated value
+            string updatedRow = "";
+            for (size_t i = 0; i < columns.size(); ++i) {
+                updatedRow += columns[i];
+                if (i != columns.size() - 1) {
+                    updatedRow += ",";
+                }
+            }
+
+            // Update the row in the table
+            tableData["customer"][distance(tableData["customer"].begin(), it)] = updatedRow;
+            found = true;
+            break;  // Exit loop after updating the row
+        } else {
+        }
+    }
+
+    if (!found) {
+        writeToOutputFile("No matching row found for customer_id=" + whereValue);
+    }
+}
+
 
 void processLine(const string& line, const string& filename) {
-    // Print each line
-    writeToOutputFile(line);
+    // Skip empty or whitespace-only lines
+    if (line.empty() || line.find_first_not_of(" \t\n\r") == string::npos) {
+        return;  // Skip this line
+    }
 
+    // Add '>' before the commands like CREATE, INSERT, DATABASES, etc.
+    string modifiedLine = line;
+    bool isCommand = false;
+
+    if (modifiedLine.find("CREATE") != string::npos ||
+        modifiedLine.find("DATABASES") != string::npos ||
+        modifiedLine.find("INSERT INTO") != string::npos ||
+        modifiedLine.find("SELECT") != string::npos ||
+        modifiedLine.find("UPDATE") != string::npos ||
+        modifiedLine.find("DELETE") != string::npos ||
+        modifiedLine.find("TABLES") != string::npos) {
+        modifiedLine = ">" + modifiedLine;
+        isCommand = true;
+    }
+
+    // If it's a command, print it with '>'
+    writeToOutputFile(modifiedLine);
+
+    // Handle different commands as before
     if (line.find("CREATE") != string::npos) {
         // Check if it's CREATE FILE or CREATE TABLE
         size_t pos = line.find("CREATE") + 6;
@@ -172,11 +318,15 @@ void processLine(const string& line, const string& filename) {
         string fileName = line.substr(spacePos + 1);
         fileName.erase(remove_if(fileName.begin(), fileName.end(), ::isspace), fileName.end());
 
+        // Remove semicolon if it exists at the end of the fileName
+        if (!fileName.empty() && fileName.back() == ';') {
+            fileName.pop_back();  // Removes the semicolon
+        }
+
         // If it's creating a file (not a table), just create the file
         if (line.find("TABLE") == string::npos) {
-            createFile(fileName);
+            createFile(fileName);  // Now it passes without the semicolon
         }
-        // Otherwise, create the table
         else {
             createTable(line);
         }
@@ -191,19 +341,20 @@ void processLine(const string& line, const string& filename) {
         tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end());
 
         if (createdTables.find(tableName) == createdTables.end()) {
-            writeToOutputFile("Table does not exist: " + tableName);
+            writeToOutputFile("> Table does not exist: " + tableName);
         } else {
             size_t rowCount = tableData[tableName].size();
-            writeToOutputFile(to_string(rowCount));
+
+            // Write the count without the '>' symbol
+            writeToOutputFile(to_string(rowCount));  // Directly write the count without ">"
         }
     } else if (line.find("SELECT * FROM") != string::npos) {
         string tableName = line.substr(14, line.find(';') - 14);
         tableName.erase(remove_if(tableName.begin(), tableName.end(), ::isspace), tableName.end());
 
         if (createdTables.find(tableName) == createdTables.end()) {
-            writeToOutputFile("Table does not exist: " + tableName);
+            writeToOutputFile("> Table does not exist: " + tableName);
         } else {
-
             // Assuming column names are stored in the first row or manually defined
             writeToOutputFile("customer_id, customer_name, customer_city, customer_state, customer_country, customer_phone, customer_email");
             for (const string& row : tableData[tableName]) {
@@ -219,11 +370,13 @@ void processLine(const string& line, const string& filename) {
                     cleanedRow.erase(posStart, 1);  // Remove single quotes
                 }
 
-                writeToOutputFile(cleanedRow);  // Display data without parentheses and quotes
+                writeToOutputFile(cleanedRow);  // Display data without '>'
             }
         }
     } else if (line.find("DELETE FROM") != string::npos) {
         processDeleteData(line);  // Pass 'line' directly as an argument
+    } else if (line.find("UPDATE") != string::npos) {
+        processUpdateData(line);  // Pass the UPDATE command directly to the function
     }
 }
 
@@ -231,7 +384,6 @@ int main() {
     string basePath = "C:\\Users\\User\\Projects\\Light_Mariadb_Interpreter\\data\\";  // Base directory
     string fileInput;
 
-    cout << "Enter the .mdb file name: ";
     getline(cin, fileInput);
     string filename = basePath + fileInput;
 

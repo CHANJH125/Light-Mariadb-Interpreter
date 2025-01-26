@@ -32,7 +32,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="data/fileInput1.mdb" />
+		<Unit filename="data/fileInput2.mdb" />
 		<Unit filename="main.cpp" />
+		<Unit filename="save.txt" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
